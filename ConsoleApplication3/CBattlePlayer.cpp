@@ -23,25 +23,68 @@ void CBattlePlayer::Message(string str)
 	send(m_sock, str.c_str(), str.size() + 1, 0);
 }
 
+bool CBattlePlayer::ReadFromFile(string filepath, string fileRecieve[10])
+{
+	ifstream file(filepath, ios_base::in);
+	if (!file.is_open())
+		return false;
+
+	return true;
+}
+
 bool CBattlePlayer::PrepareShips()
 {
-	Message("Расставляйте корабли!");
-	
-	while (!ShipsAreReady())
+	string buf; // Разработка метода задания расположения кораблей игроком из заранее подготовленного файла
+	char mode;
+	while (true)
 	{
-		if (Try2PlaceShip(recieve()))
+		do
 		{
-			Message("OK");
+			Message("Расставить корабли из заранее подготовленного файла? Y/N");
+			buf = recieve();
+			sscanf_s(buf.c_str(), "%c", &mode, 1);
+			mode = toupper(mode);
+		} while (mode != 'N' && mode != 'Y');
+		if (mode == 'N')
+		{
+			Message("Расставляйте корабли!");
+
+			while (!ShipsAreReady())
+			{
+				if (Try2PlaceShip(recieve()))
+				{
+					Message("OK");
+				}
+				else
+				{
+					Message("Ошибка в расположении корабля!");
+				}
+				Message(m_Aqua.PrintForeign());
+			}
+			Message("Ваши корабли готовы!");
 		}
 		else
-		{
-			Message("Ошибка в расположении корабля!");
+		{	
+			string fileRecieve[10];
+			if (!ReadFromFile("..\\data\\shis.txt", fileRecieve))
+			{
+				Message("Не удалось открыть файл");
+				continue;
+			}
+			Message("Идёт чтение данных из файла");
+			while (!ShipsAreReady())
+			{
+				if (!Try2PlaceShip(recieve()))
+				{
+					Message("Ошибка в расположении корабля!");
+				}
+				Message(m_Aqua.PrintForeign());
+			}
+			Message("Ваши корабли готовы!");
 		}
-		Message(m_Aqua.PrintForeign());
+
+		return true;
 	}
-	Message("Ваши корабли готовы!");
-	
-	return true;
 }
 bool CBattlePlayer::DoMove()
 {

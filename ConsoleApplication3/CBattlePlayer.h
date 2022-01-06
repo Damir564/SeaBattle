@@ -2,6 +2,7 @@
 #include "CAquatory.h"
 #include "CShip.h"
 #include <vector>
+#include <fstream>
 
 #include "winsock2.h" 
 
@@ -18,6 +19,7 @@ public:
 	bool PrepareShips();
 	bool ShipsAreReady();
 	bool DoMove();
+	bool ReadFromFile(string filename, string fileRecieve[10]);
 
 	bool Try2PlaceShip(string ship);
 	void Message(string str);

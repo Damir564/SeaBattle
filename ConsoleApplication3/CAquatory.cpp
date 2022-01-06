@@ -12,7 +12,7 @@ CAquatory::~CAquatory()
 }
 string CAquatory::PrintOwn()
 {
-	string str = "\t1\t2\t3\t4\t5\t6\t7\t8\t9\t10\n";
+	string str = "\t1\t2\t3\t4\t5\t6\t7\t8\t9\t10\n"; // Создание проверки правильности вводимых игроками данных
 	string buf;
 
 	for (int i = 0; i < 10; i++)

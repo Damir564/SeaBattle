@@ -7,6 +7,7 @@
 #include <winsock2.h>
 #include <windows.h>
 #include <locale>
+#include <iostream>
 
 #define PORT 10000
 #define SERVERADDR "127.0.0.1"
