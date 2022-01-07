@@ -62,7 +62,7 @@ int main()
       return -1;
     }
   printf("Соединение с сервером %s успешно установлено\n\
-         Наберите quit для завершения", SERVERADDR);
+         Наберите quit для завершения\n", SERVERADDR);
   // Шаг 4 - чтение и передача сообщений
   int nsize;
   while ((nsize = recv(my_sock, &buff[0], sizeof(buff) - 1, 0)) != SOCKET_ERROR)
@@ -72,7 +72,8 @@ int main()
     // выводим на экран
     printf("%s", buff);
     // читаем пользовательский ввод с клавиатуры
-    printf("Ввод: "); fgets(&buff[0], sizeof(buff) - 1, stdin);
+    printf("Ввод: "); 
+    fgets(&buff[0], sizeof(buff) - 1, stdin);
     // проверка на "quit"
     if (!strcmp(&buff[0], "quit\n"))
     {

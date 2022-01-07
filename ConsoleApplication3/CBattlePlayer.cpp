@@ -1,12 +1,14 @@
 #include "CBattlePlayer.h"
 
-#define TEST
+#define TEST = 0
+#include <iostream>
 CBattlePlayer::CBattlePlayer()
 {
 	m_sock = 0;
 	m_pAnotherPlayer = NULL;
 
 }
+
 CBattlePlayer::~CBattlePlayer()
 {
 	for (size_t i = 0; i < m_Ships.size(); i++)
@@ -28,23 +30,38 @@ bool CBattlePlayer::ReadFromFile(string filepath, string fileRecieve[10])
 	ifstream file(filepath, ios_base::in);
 	if (!file.is_open())
 		return false;
+	string temp;
+	for (int i = 0; i != 10; ++i)
+	{
+		if (!(file >> fileRecieve[i]))
+		{
+			file.close();
+			return false;
+		}
+	}
+	file.close();
 
 	return true;
 }
 
 bool CBattlePlayer::PrepareShips()
 {
+	//ofstream debug("..\\data\\debug.txt");
 	string buf; // Разработка метода задания расположения кораблей игроком из заранее подготовленного файла
 	char mode;
+	Message("Расставить корабли из заранее подготовленного файла? Y/N");
 	while (true)
 	{
 		do
-		{
-			Message("Расставить корабли из заранее подготовленного файла? Y/N");
+		{		
 			buf = recieve();
 			sscanf_s(buf.c_str(), "%c", &mode, 1);
 			mode = toupper(mode);
-		} while (mode != 'N' && mode != 'Y');
+			if (mode != 'N' && mode != 'Y')
+				Message("Неверный ввод");
+			else
+				break;
+		} while (true);
 		if (mode == 'N')
 		{
 			Message("Расставляйте корабли!");
@@ -59,30 +76,34 @@ bool CBattlePlayer::PrepareShips()
 				{
 					Message("Ошибка в расположении корабля!");
 				}
-				Message(m_Aqua.PrintForeign());
+				//Message(m_Aqua.PrintForeign());
 			}
 			Message("Ваши корабли готовы!");
 		}
 		else
 		{	
 			string fileRecieve[10];
-			if (!ReadFromFile("..\\data\\shis.txt", fileRecieve))
+			if (!ReadFromFile("..\\data\\ships.txt", fileRecieve))
 			{
-				Message("Не удалось открыть файл");
+				Message("Ошибка чтения с файла\nРасставить корабли из заранее подготовленного файла? Y/N");
 				continue;
 			}
-			Message("Идёт чтение данных из файла");
-			while (!ShipsAreReady())
+			//Message("Идёт чтение данных из файла");
+			for (int i = 0; i != 10; ++i)
 			{
-				if (!Try2PlaceShip(recieve()))
+				if (!Try2PlaceShip(fileRecieve[i]))
 				{
 					Message("Ошибка в расположении корабля!");
 				}
-				Message(m_Aqua.PrintForeign());
+				// debug << fileRecieve[i] << std::endl;
+				//Message(m_Aqua.PrintForeign());
 			}
-			Message("Ваши корабли готовы!");
+			//recieve();
+			//Message(m_Aqua.PrintForeign());
+			Message(to_string(ShipsAreReady()));
+			//Message("Ваши корабли готовы!");
+			//debug.close();
 		}
-
 		return true;
 	}
 }
@@ -187,6 +208,9 @@ bool CBattlePlayer::Try2PlaceShip(string ship)
 	}
 	
 	CShip *s = new CShip(iDeck);
+	// Проверка правильности ввода
+	if (iDeck <= 0 || buf[0] == -52 || buf[1] == -52)
+		return false;
 
 	for (int i = 0; i < iDeck; i++)
 	{
@@ -211,7 +235,6 @@ bool CBattlePlayer::Try2PlaceShip(string ship)
 string CBattlePlayer::recieve()
 {
 	char buff[1024];
-
 	recv(m_sock, &buff[0], sizeof(buff), 0);
 
 	return buff;
