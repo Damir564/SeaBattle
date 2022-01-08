@@ -21,8 +21,11 @@ CBattlePlayer::~CBattlePlayer()
 }
 void CBattlePlayer::Message(string str)
 {
-	str = "\n" + str + "\n";
+	str = str + "\n";
+	//char buf[10];
 	send(m_sock, str.c_str(), str.size() + 1, 0);
+	Sleep(10);
+	//recv(m_sock, &buf[0], 1, 0);
 }
 
 bool CBattlePlayer::ReadFromFile(string filepath, string fileRecieve[10])
@@ -100,7 +103,7 @@ bool CBattlePlayer::PrepareShips()
 			}
 			//recieve();
 			//Message(m_Aqua.PrintForeign());
-			Message(to_string(ShipsAreReady()));
+			//Message(to_string(ShipsAreReady()));
 			//Message("Ваши корабли готовы!");
 			//debug.close();
 		}
@@ -235,7 +238,9 @@ bool CBattlePlayer::Try2PlaceShip(string ship)
 string CBattlePlayer::recieve()
 {
 	char buff[1024];
-	recv(m_sock, &buff[0], sizeof(buff), 0);
+	Message("command_input");
+	int nsize = recv(m_sock, &buff[0], sizeof(buff), 0);
+	Sleep(10);
 
 	return buff;
 }

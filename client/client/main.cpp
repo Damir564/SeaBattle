@@ -3,7 +3,7 @@
 
 // Пример простого TCP-клиента
 #include <stdio.h>
-#include <string.h>
+#include <string>
 #include <winsock2.h>
 #include <windows.h>
 #include <locale>
@@ -11,6 +11,7 @@
 
 #define PORT 10000
 #define SERVERADDR "127.0.0.1"
+
 int main()
 {
   setlocale(LC_ALL, "RUS");
@@ -65,15 +66,25 @@ int main()
          Наберите quit для завершения\n", SERVERADDR);
   // Шаг 4 - чтение и передача сообщений
   int nsize;
+  std::string userInput;
   while ((nsize = recv(my_sock, &buff[0], sizeof(buff) - 1, 0)) != SOCKET_ERROR)
   {
     // ставим завершающий ноль в конце строки
     buff[nsize] = 0;
     // выводим на экран
-    printf("%s", buff);
     // читаем пользовательский ввод с клавиатуры
-    printf("Ввод: "); 
-    fgets(&buff[0], sizeof(buff) - 1, stdin);
+    if (!strcmp(&buff[0], "command_input\n"))
+    {
+        printf("Ввод: ");
+        std::getline(std::cin, userInput);
+        send(my_sock, userInput.c_str(), userInput.size() + 1, 0);
+        Sleep(10);
+    }
+    else
+    {
+        printf("%s", buff);
+        Sleep(10);
+    }
     // проверка на "quit"
     if (!strcmp(&buff[0], "quit\n"))
     {
@@ -84,7 +95,6 @@ int main()
       return 0;
     }
     // передаем строку клиента серверу
-    send(my_sock, &buff[0], nsize, 0);
   }
   printf("Recv error %d\n", WSAGetLastError());
   closesocket(my_sock);
