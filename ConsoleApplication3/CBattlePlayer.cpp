@@ -113,7 +113,14 @@ bool CBattlePlayer::PrepareShips()
 bool CBattlePlayer::DoMove()
 {
 	Message("Ваш ход!");
-	string move = recieve();
+	string move;
+	do
+	{
+		move = recieve();
+		if (Try2DoMove(move))
+			break;
+		Message("Неверный ввод");
+	} while (!Try2DoMove(move));
 
 	CShip *ship=NULL;
 	if (m_pAnotherPlayer->m_Aqua.TestShip(move, &ship))
@@ -232,6 +239,19 @@ bool CBattlePlayer::Try2PlaceShip(string ship)
 	}
 
 	m_Ships.push_back(s);
+
+	return true;
+}
+bool CBattlePlayer::Try2DoMove(string str)
+{
+	if (str.size() > 3 || str.size() == 0)
+		return false;
+	char letter;
+	int number;
+	sscanf_s(str.c_str(), "%c%i", &letter, 1, &number);
+	letter = tolower(letter);
+	if (letter < 97 || letter > 106 || number <= 0 || number > 10)
+		return false;
 
 	return true;
 }

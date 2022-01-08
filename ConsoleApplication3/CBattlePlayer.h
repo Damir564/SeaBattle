@@ -22,6 +22,7 @@ public:
 	bool ReadFromFile(string filename, string fileRecieve[10]);
 
 	bool Try2PlaceShip(string ship);
+	bool Try2DoMove(string str);
 	void Message(string str);
 
 	string recieve();
