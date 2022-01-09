@@ -3,6 +3,7 @@
 #include "CShip.h"
 #include <vector>
 #include <fstream>
+#include <set>
 
 #include "winsock2.h" 
 
@@ -14,6 +15,7 @@ public:
 
 	CAquatory m_Aqua;
 	vector <CShip*> m_Ships;
+	set <pair<char, int>> m_Moves;
 
 	SOCKET m_sock;
 	bool PrepareShips();

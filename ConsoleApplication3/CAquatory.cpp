@@ -1,7 +1,6 @@
 #include "CAquatory.h"
 #include <iostream>
 
-using namespace std;
 CAquatory::CAquatory()
 {
 
@@ -14,11 +13,11 @@ string CAquatory::PrintOwn()
 {
 	string str = "\t1\t2\t3\t4\t5\t6\t7\t8\t9\t10\n"; // Создание проверки правильности вводимых игроками данных
 	string buf;
-
+	char tempChar = 'A' - 1;
 	for (int i = 0; i < 10; i++)
 	{
-		
-		str += (to_string(i + 1) + "\t");
+		tempChar = tempChar + 1;
+		str += string(1, tempChar) + "\t";
 		for (int j = 0; j < 10; j++)
 		{
 			str += m_Cells[i][j].PrintOwn();
@@ -31,9 +30,11 @@ string CAquatory::PrintForeign()
 {
 	string str = "\t1\t2\t3\t4\t5\t6\t7\t8\t9\t10\n";
 	string buf;
+	char tempChar = 'A' - 1;
 	for (int i = 0; i < 10; i++)
 	{
-		str += (to_string(i + 1) + "\t");
+		tempChar = tempChar + 1;
+		str += string(1, tempChar) + "\t";
 		for (int j = 0; j < 10; j++)
 		{
 			str += m_Cells[i][j].PrintForeign();

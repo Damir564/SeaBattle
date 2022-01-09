@@ -6,7 +6,7 @@ CBattlePlayer::CBattlePlayer()
 {
 	m_sock = 0;
 	m_pAnotherPlayer = NULL;
-
+	m_Moves = {};
 }
 
 CBattlePlayer::~CBattlePlayer()
@@ -79,7 +79,7 @@ bool CBattlePlayer::PrepareShips()
 				{
 					Message("Ошибка в расположении корабля!");
 				}
-				//Message(m_Aqua.PrintForeign());
+				Message(m_Aqua.PrintOwn());
 			}
 			Message("Ваши корабли готовы!");
 		}
@@ -99,8 +99,8 @@ bool CBattlePlayer::PrepareShips()
 					Message("Ошибка в расположении корабля!");
 				}
 				// debug << fileRecieve[i] << std::endl;
-				//Message(m_Aqua.PrintForeign());
 			}
+			Message(m_Aqua.PrintOwn());
 			//recieve();
 			//Message(m_Aqua.PrintForeign());
 			//Message(to_string(ShipsAreReady()));
@@ -112,8 +112,9 @@ bool CBattlePlayer::PrepareShips()
 }
 bool CBattlePlayer::DoMove()
 {
-	Message("Ваш ход!");
-	string move;
+	//Message(m_Aqua.PrintOwn());
+	Message("Ваш ход!\n" + m_pAnotherPlayer->m_Aqua.PrintForeign());
+	string move = "";
 	do
 	{
 		move = recieve();
@@ -126,6 +127,7 @@ bool CBattlePlayer::DoMove()
 	if (m_pAnotherPlayer->m_Aqua.TestShip(move, &ship))
 	{
 		Message("Попадание!");
+		m_pAnotherPlayer->Message("Противник попал на " + move);
 
 		if (!ship->Alive())
 		{
@@ -137,13 +139,19 @@ bool CBattlePlayer::DoMove()
 				m_pAnotherPlayer->Message("Вы проиграли(");
 				return true;
 			}
+			else
+			{
+				m_pAnotherPlayer->Message("Ваш корабль на потоплен(\n");
+			}
 		}
-		
+		m_pAnotherPlayer->Message(m_pAnotherPlayer->m_Aqua.PrintOwn());
 		DoMove();
-
 	}
 	else
-		Message("Мимо(");
+	{
+		Message("Мимо(\n");
+		m_pAnotherPlayer->Message("Противник промахнулся) по" + move + "\n" + m_pAnotherPlayer->m_Aqua.PrintOwn());
+	}
 	
 	return true;
 }
@@ -250,8 +258,12 @@ bool CBattlePlayer::Try2DoMove(string str)
 	int number;
 	sscanf_s(str.c_str(), "%c%i", &letter, 1, &number);
 	letter = tolower(letter);
+	pair<char, int> tempPair = make_pair(letter, number);
+	if (m_Moves.count(tempPair) > 0)
+		return false;
 	if (letter < 97 || letter > 106 || number <= 0 || number > 10)
 		return false;
+	m_Moves.insert(make_pair(letter, number));
 
 	return true;
 }

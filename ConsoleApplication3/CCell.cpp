@@ -9,11 +9,20 @@ CCell::CCell()
 }
 string CCell::PrintOwn()
 {
-	
-	if (m_pShip)
-		return "S\t";
+	if (m_bBeated)
+	{
+		if (m_pShip)
+			return "N\t";
+		else
+			return  "#\t";
+	}
 	else
-		return  "\t";
+	{
+		if (m_pShip)
+			return "S\t";
+		else
+			return ".\t";
+	}
 
 }
 string CCell::PrintForeign()
@@ -26,10 +35,9 @@ string CCell::PrintForeign()
 			return "#\t";
 	}
 	else
-		if (m_pShip)
-			return "*\t";
-		else
-			return  ".\t";
+	{
+		return ".\t";
+	}
 
 }
 
