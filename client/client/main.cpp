@@ -80,20 +80,22 @@ int main()
         send(my_sock, userInput.c_str(), userInput.size() + 1, 0);
         Sleep(10);
     }
+    else if (!strcmp(&buff[0], "command_quit\n"))
+    {
+        // Корректный выход
+        printf("Экзит...");
+        closesocket(my_sock);
+        WSACleanup();
+        std::system("pause");
+        return 0;
+    }
     else
     {
         printf("%s", buff);
         Sleep(10);
     }
     // проверка на "quit"
-    if (!strcmp(&buff[0], "quit\n"))
-    {
-      // Корректный выход
-      printf("Экзит...");
-      closesocket(my_sock);
-      WSACleanup();
-      return 0;
-    }
+    
     // передаем строку клиента серверу
   }
   printf("Recv error %d\n", WSAGetLastError());

@@ -10,7 +10,6 @@ int main()
 {
 	CBattleGame game;
 	
-	
 	if (game.StartTCP(10000))
 		game.DoPlay();
 

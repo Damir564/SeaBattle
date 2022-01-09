@@ -1,4 +1,5 @@
 #pragma once
+#include <thread>
 #include "CBattlePlayer.h"
 
 #define MOVE1 1
@@ -19,5 +20,8 @@ public:
 	void DoPlay();
 
 	CBattlePlayer m_Player1, m_Player2;
+
+private:
+	void prepareShips();
 };
 

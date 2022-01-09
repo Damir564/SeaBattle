@@ -92,21 +92,32 @@ bool CBattleGame::StartTCP(int port)
 	return true;
 }
 
+void CBattleGame::prepareShips()
+{
+	m_Player1.PrepareShips();
+	m_Player2.PrepareShips();
+}
+
 void CBattleGame::DoPlay()
 {
-	m_Player2.Message("Соперник расставляет корабли. Подождите некоторое время.");
+	std::thread player1Thread(&CBattlePlayer::PrepareShips, &m_Player1);
+	std::thread player2Thread(&CBattlePlayer::PrepareShips, &m_Player2);
 
-	if (m_Player1.PrepareShips())
-	{
-		m_Player1.Message("Соперник расставляет корабли. Подождите некоторое время.");
+	player1Thread.join();
+	player2Thread.join();
+	//m_Player2.Message("Соперник расставляет корабли. Подождите некоторое время.");
 
-	}
-	if (!m_Player2.PrepareShips())
-	{
-		return;
-	}
+	//if (m_Player1.PrepareShips())
+	//{
+	//	m_Player1.Message("Соперник расставляет корабли. Подождите некоторое время.");
 
-	while (m_Player1.IsAlive() and m_Player2.IsAlive())
+	//}
+	//if (!m_Player2.PrepareShips())
+	//{
+	//	return;
+	//}
+
+	while (m_Player1.IsAlive() && m_Player2.IsAlive())
 	{
 		if (m_iCurrentMove == MOVE1)
 			m_Player1.DoMove();
@@ -116,4 +127,6 @@ void CBattleGame::DoPlay()
 		
 		m_iCurrentMove *= -1;
 	}
+	m_Player1.Message("command_quit");
+	m_Player2.Message("command_quit");
 }
