@@ -8,9 +8,34 @@
 #include <windows.h>
 #include <locale>
 #include <iostream>
+#include <fstream>
 
 #define PORT 10000
 #define SERVERADDR "127.0.0.1"
+
+using namespace std;
+
+
+string readFromFile(string filepath)
+{
+    ifstream file(filepath, ios_base::in);
+    if (!file.is_open())
+        return "NULL";
+    string answer = "";
+    string temp;
+    for (int i = 0; i != 10; ++i)
+    {
+        if (!(file >> temp))
+        {
+            file.close();
+            return "NULL";
+        }
+        answer += temp + "\n";
+    }
+    file.close();
+
+    return answer;
+}
 
 int main()
 {
@@ -18,7 +43,7 @@ int main()
 
   WSAData wsaData;
   char buff[1024];
-  printf("Клиент из стартед!\n");
+  printf("Игра морской бой!\n");
   // Шаг 1 - инициализация библиотеки Winsock
   if (WSAStartup(MAKEWORD(2,2), (WSADATA *)&wsaData))
   {
@@ -63,10 +88,10 @@ int main()
       return -1;
     }
   printf("Соединение с сервером %s успешно установлено\n\
-         Наберите quit для завершения\n", SERVERADDR);
+         Наберите command_quit для завершения\n", SERVERADDR);
   // Шаг 4 - чтение и передача сообщений
   int nsize;
-  std::string userInput;
+  string userInput;
   while ((nsize = recv(my_sock, &buff[0], sizeof(buff) - 1, 0)) != SOCKET_ERROR)
   {
     // ставим завершающий ноль в конце строки
@@ -76,9 +101,14 @@ int main()
     if (!strcmp(&buff[0], "command_input\n"))
     {
         printf("Ввод: ");
-        std::getline(std::cin, userInput);
+        getline(std::cin, userInput);
         send(my_sock, userInput.c_str(), userInput.size() + 1, 0);
         Sleep(10);
+    }
+    else if (!strcmp(&buff[0], "command_file\n"))
+    {
+        userInput = readFromFile("..\\data\\ships.txt");
+        send(my_sock, userInput.c_str(), userInput.size() + 1, 0);
     }
     else if (!strcmp(&buff[0], "command_quit\n"))
     {
@@ -86,7 +116,7 @@ int main()
         printf("Экзит...");
         closesocket(my_sock);
         WSACleanup();
-        std::system("pause");
+        system("pause");
         return 0;
     }
     else

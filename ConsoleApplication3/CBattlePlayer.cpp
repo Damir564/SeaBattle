@@ -28,28 +28,24 @@ void CBattlePlayer::Message(string str)
 	//recv(m_sock, &buf[0], 1, 0);
 }
 
-bool CBattlePlayer::ReadFromFile(string filepath, string fileRecieve[10])
+bool CBattlePlayer::ReadFromFile(string fileRecieve[10])
 {
-	ifstream file(filepath, ios_base::in);
-	if (!file.is_open())
+	string fileInput = recieveFile();
+	if (fileInput == "NULL" || count(fileInput.begin(), fileInput.end(), '\n') != 10)
 		return false;
-	string temp;
-	for (int i = 0; i != 10; ++i)
+	int pos = 0;
+	for (int i = 0;i != 10; ++i)
 	{
-		if (!(file >> fileRecieve[i]))
-		{
-			file.close();
-			return false;
-		}
+		pos = fileInput.find('\n');
+		fileRecieve[i] = fileInput.substr(0, pos);
+		fileInput.erase(0, pos + 1);
 	}
-	file.close();
 
 	return true;
 }
 
 bool CBattlePlayer::PrepareShips()
 {
-	//ofstream debug("..\\data\\debug.txt");
 	string buf; // Разработка метода задания расположения кораблей игроком из заранее подготовленного файла
 	char mode;
 	Message("Расставить корабли из заранее подготовленного файла? Y/N");
@@ -86,7 +82,7 @@ bool CBattlePlayer::PrepareShips()
 		else
 		{	
 			string fileRecieve[10];
-			if (!ReadFromFile("..\\data\\ships.txt", fileRecieve))
+			if (!ReadFromFile(fileRecieve))
 			{
 				Message("Ошибка чтения с файла\nРасставить корабли из заранее подготовленного файла? Y/N");
 				continue;
@@ -258,12 +254,14 @@ bool CBattlePlayer::Try2DoMove(string str)
 	int number;
 	sscanf_s(str.c_str(), "%c%i", &letter, 1, &number);
 	letter = tolower(letter);
-	pair<char, int> tempPair = make_pair(letter, number);
-	if (m_Moves.count(tempPair) > 0)
-		return false;
 	if (letter < 97 || letter > 106 || number <= 0 || number > 10)
 		return false;
-	m_Moves.insert(make_pair(letter, number));
+	if (m_pAnotherPlayer->m_Aqua.m_Cells[letter - 97][number - 1].m_bBeated)
+		return false;
+	//pair<char, int> tempPair = make_pair(letter, number);
+	//if (m_Moves.count(tempPair) > 0)
+	//	return false;	
+	//m_Moves.insert(make_pair(letter, number));
 
 	return true;
 }
@@ -271,6 +269,15 @@ string CBattlePlayer::recieve()
 {
 	char buff[1024];
 	Message("command_input");
+	int nsize = recv(m_sock, &buff[0], sizeof(buff), 0);
+	Sleep(10);
+
+	return buff;
+}
+string CBattlePlayer::recieveFile()
+{
+	char buff[1024];
+	Message("command_file");
 	int nsize = recv(m_sock, &buff[0], sizeof(buff), 0);
 	Sleep(10);
 

@@ -19,15 +19,16 @@ public:
 
 	SOCKET m_sock;
 	bool PrepareShips();
+	bool ReadFromFile(string fileRecieve[10]);
 	bool ShipsAreReady();
 	bool DoMove();
-	bool ReadFromFile(string filename, string fileRecieve[10]);
 
 	bool Try2PlaceShip(string ship);
 	bool Try2DoMove(string str);
 	void Message(string str);
 
 	string recieve();
+	string recieveFile();
 
 	CBattlePlayer *m_pAnotherPlayer;
 
