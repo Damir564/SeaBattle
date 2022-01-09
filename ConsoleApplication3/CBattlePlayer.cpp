@@ -44,6 +44,15 @@ bool CBattlePlayer::ReadFromFile(string fileRecieve[10])
 	return true;
 }
 
+bool CBattlePlayer::Try2RandomAquatory()
+{
+	int shipsToPlace[5] = { 0, 4, 3, 2, 1 };
+	for (int i = 5; i != 0; --i)
+	{
+
+	}
+}
+
 bool CBattlePlayer::PrepareShips()
 {
 	string buf; // Разработка метода задания расположения кораблей игроком из заранее подготовленного файла
@@ -63,21 +72,37 @@ bool CBattlePlayer::PrepareShips()
 		} while (true);
 		if (mode == 'N')
 		{
-			Message("Расставляйте корабли!");
-
-			while (!ShipsAreReady())
+			Message("Расставить корабли случайно? Y/N");
+			do
 			{
-				if (Try2PlaceShip(recieve()))
-				{
-					Message("OK");
-				}
+				buf = recieve();
+				sscanf_s(buf.c_str(), "%c", &mode, 1);
+				mode = toupper(mode);
+				if (mode != 'N' && mode != 'Y')
+					Message("Неверный ввод");
 				else
-				{
-					Message("Ошибка в расположении корабля!");
-				}
-				Message(m_Aqua.PrintOwn());
+					break;
+			} while (true);
+			if (mode == 'Y')
+			{
+				//Try2RandomAquatory();
 			}
-			Message("Ваши корабли готовы!");
+			else
+			{
+				while (!ShipsAreReady())
+				{
+					if (Try2PlaceShip(recieve()))
+					{
+						Message("OK");
+					}
+					else
+					{
+						Message("Ошибка в расположении корабля!");
+					}
+					Message(m_Aqua.PrintOwn());
+				}
+				Message("Ваши корабли готовы! Ожидайте соперника");
+			}
 		}
 		else
 		{	
@@ -103,6 +128,7 @@ bool CBattlePlayer::PrepareShips()
 			//Message("Ваши корабли готовы!");
 			//debug.close();
 		}
+		Message("Ваши корабли готовы! Ожидайте соперника");
 		return true;
 	}
 }
@@ -117,13 +143,13 @@ bool CBattlePlayer::DoMove()
 		if (Try2DoMove(move))
 			break;
 		Message("Неверный ввод");
-	} while (!Try2DoMove(move));
+	} while (true);
 
 	CShip *ship=NULL;
 	if (m_pAnotherPlayer->m_Aqua.TestShip(move, &ship))
 	{
 		Message("Попадание!");
-		m_pAnotherPlayer->Message("Противник попал на " + move);
+		m_pAnotherPlayer->Message("Соперник  попал на " + move);
 
 		if (!ship->Alive())
 		{
@@ -131,13 +157,13 @@ bool CBattlePlayer::DoMove()
 
 			if (!m_pAnotherPlayer->IsAlive())
 			{
-				Message("Вы выиграли(");
+				Message("Вы выиграли)");
 				m_pAnotherPlayer->Message("Вы проиграли(");
 				return true;
 			}
 			else
 			{
-				m_pAnotherPlayer->Message("Ваш корабль на потоплен(\n");
+				m_pAnotherPlayer->Message("Ваш корабль потоплен(\n");
 			}
 		}
 		m_pAnotherPlayer->Message(m_pAnotherPlayer->m_Aqua.PrintOwn());
@@ -146,7 +172,7 @@ bool CBattlePlayer::DoMove()
 	else
 	{
 		Message("Мимо(\n");
-		m_pAnotherPlayer->Message("Противник промахнулся) по" + move + "\n" + m_pAnotherPlayer->m_Aqua.PrintOwn());
+		m_pAnotherPlayer->Message("Противник промахнулся) по " + move + "\n" + m_pAnotherPlayer->m_Aqua.PrintOwn());
 	}
 	
 	return true;
@@ -248,16 +274,21 @@ bool CBattlePlayer::Try2PlaceShip(string ship)
 }
 bool CBattlePlayer::Try2DoMove(string str)
 {
-	if (str.size() > 3 || str.size() == 0)
+	int num, number;
+	if (!m_Aqua.ParseCell(str, num, number))// Try2DoMove(move))
 		return false;
-	char letter;
-	int number;
-	sscanf_s(str.c_str(), "%c%i", &letter, 1, &number);
-	letter = tolower(letter);
-	if (letter < 97 || letter > 106 || number <= 0 || number > 10)
+	if (m_pAnotherPlayer->m_Aqua.m_Cells[num][number].m_bBeated)
 		return false;
-	if (m_pAnotherPlayer->m_Aqua.m_Cells[letter - 97][number - 1].m_bBeated)
-		return false;
+	//if (str.size() > 3 || str.size() == 0)
+	//	return false;
+	//char letter;
+	//int number;
+	//sscanf_s(str.c_str(), "%c%i", &letter, 1, &number);
+	//letter = tolower(letter);
+	//if (letter < 97 || letter > 106 || number <= 0 || number > 10)
+	//	return false;
+	//if (m_pAnotherPlayer->m_Aqua.m_Cells[letter - 97][number - 1].m_bBeated)
+	//	return false;
 	//pair<char, int> tempPair = make_pair(letter, number);
 	//if (m_Moves.count(tempPair) > 0)
 	//	return false;	

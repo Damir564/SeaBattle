@@ -103,8 +103,9 @@ void CBattleGame::DoPlay()
 	std::thread player1Thread(&CBattlePlayer::PrepareShips, &m_Player1);
 	std::thread player2Thread(&CBattlePlayer::PrepareShips, &m_Player2);
 
-	player1Thread.join();
 	player2Thread.join();
+	player1Thread.join();
+	m_Player2.Message("Ход соперника");
 	//m_Player2.Message("Соперник расставляет корабли. Подождите некоторое время.");
 
 	//if (m_Player1.PrepareShips())

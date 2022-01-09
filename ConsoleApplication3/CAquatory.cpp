@@ -60,14 +60,15 @@ bool CAquatory::ParseCell(string cell, int &i, int&j)
 	i = num;
 	j = number;
 
-	return true;
+	if (num >-1)
+		return true;
+	return false;
 }
 bool CAquatory::Try2PlaceDeck(string cell,CCell **pCell, CShip *sh)
 {
 	int num, number;
-	ParseCell(cell, num, number);
 	
-	if (num > -1)
+	if (ParseCell(cell, num, number))
 	{
 		if (TestCell4ShipDeck(num, number, sh))
 		{
