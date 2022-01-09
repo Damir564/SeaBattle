@@ -2,6 +2,7 @@
 
 #define TEST = 0
 #include <iostream>
+#include <ctime>
 CBattlePlayer::CBattlePlayer()
 {
 	m_sock = 0;
@@ -47,10 +48,94 @@ bool CBattlePlayer::ReadFromFile(string fileRecieve[10])
 bool CBattlePlayer::Try2RandomAquatory()
 {
 	int shipsToPlace[5] = { 0, 4, 3, 2, 1 };
-	for (int i = 5; i != 0; --i)
+	srand(time(0));
+	int x, y;
+	char letter;
+	bool isXGreater;
+	bool isXLess;
+	bool isYGreater;
+	bool isYLess;
+	string shipString = "";
+	for (int i = 4; i != 1; --i)
 	{
-
+		while (shipsToPlace[i])
+		{
+			x = rand() % 10;
+			isXGreater = (x + i - 1) > 9;
+			isXLess = (x - i + 1) < 0;
+			if (isXGreater && isXLess)
+				continue;
+			y = rand() % 10;
+			isYGreater = (y + i - 1) > 9;
+			isYLess = (y - i + 1) < 0;
+			if (isYGreater && isYLess)
+				continue;
+			letter = 'A' + y;
+			shipString = to_string(i) + "(";
+			if (isXGreater)
+			{
+				for (int j = 0; j != i; ++j)
+				{
+					shipString += string(1, letter) + to_string(x - j + 1) + ",";
+				}
+				if (Try2PlaceShip(shipString))
+				{
+					shipsToPlace[i] -= 1;
+					continue;
+				}
+			}
+			shipString = to_string(i) + "(";
+			if (isXLess)
+			{
+				for (int j = 0; j != i; ++j)
+				{
+					shipString += string(1, letter) + to_string(x + j + 1) + ",";
+				}
+				if (Try2PlaceShip(shipString))
+				{
+					shipsToPlace[i] -= 1;
+					continue;
+				}
+			}
+			shipString = to_string(i) + "(";
+			if (isYGreater)
+			{
+				for (int j = 0; j != i; ++j)
+				{
+					shipString += string(1, letter - j) + to_string(x + 1) + ",";
+				}
+				if (Try2PlaceShip(shipString))
+				{
+					shipsToPlace[i] -= 1;
+					continue;
+				}
+			}
+			shipString = to_string(i) + "(";
+			if (isYLess)
+			{
+				for (int j = 0; j != i; ++j)
+				{
+					shipString += string(1, letter + j) + to_string(x + 1) + ",";
+				}
+				if (Try2PlaceShip(shipString))
+				{
+					shipsToPlace[i] -= 1;
+					continue;
+				}
+			}
+		}
 	}
+	while (shipsToPlace[1])
+	{
+		x = rand() % 10;
+		y = rand() % 10;
+		letter = 'A' + y;
+		shipString = "1(" + string(1, letter) + to_string(x + 1);
+		if (Try2PlaceShip(shipString))
+			shipsToPlace[1] -= 1;
+	}
+
+	return true;
 }
 
 bool CBattlePlayer::PrepareShips()
@@ -85,7 +170,11 @@ bool CBattlePlayer::PrepareShips()
 			} while (true);
 			if (mode == 'Y')
 			{
-				//Try2RandomAquatory();
+				while (!ShipsAreReady())
+				{
+					Try2RandomAquatory();
+					Message(m_Aqua.PrintOwn());
+				}
 			}
 			else
 			{
@@ -94,12 +183,12 @@ bool CBattlePlayer::PrepareShips()
 					if (Try2PlaceShip(recieve()))
 					{
 						Message("OK");
+						Message(m_Aqua.PrintOwn());
 					}
 					else
 					{
 						Message("Ошибка в расположении корабля!");
-					}
-					Message(m_Aqua.PrintOwn());
+					}				
 				}
 				Message("Ваши корабли готовы! Ожидайте соперника");
 			}
@@ -246,11 +335,21 @@ bool CBattlePlayer::Try2PlaceShip(string ship)
 	{
 		sscanf_s(buf, "%[^\n],", cell[0], 10);
 	}
-	
-	CShip *s = new CShip(iDeck);
 	// Проверка правильности ввода
-	if (iDeck <= 0 || buf[0] == -52 || buf[1] == -52)
+	if (iDeck <= 0 || strlen(buf) < 2 || strlen(buf) >= 60)
 		return false;
+	bool rowEqual = true;
+	bool columnEqual = true;
+	for (int i = 1; i != iDeck; ++i)
+	{
+		if (cell[i - 1][0] != cell[i][0])
+			columnEqual = false;
+		if (cell[i - 1][1] != cell[i][1])
+			rowEqual = false;
+	}
+	if (rowEqual + columnEqual == 0)
+		return false;
+	CShip* s = new CShip(iDeck);
 
 	for (int i = 0; i < iDeck; i++)
 	{

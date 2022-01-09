@@ -24,12 +24,13 @@ public:
 	bool DoMove();
 
 	bool Try2PlaceShip(string ship);
-	bool Try2RandomAquatory();
 	bool Try2DoMove(string str);
 	void Message(string str);
 
 	string recieve();
 	string recieveFile();
+
+	bool Try2RandomAquatory();
 
 	CBattlePlayer *m_pAnotherPlayer;
 
