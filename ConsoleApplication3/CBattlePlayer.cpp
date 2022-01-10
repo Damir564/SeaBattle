@@ -138,6 +138,17 @@ bool CBattlePlayer::Try2RandomAquatory()
 	return true;
 }
 
+bool CBattlePlayer::ComputerPrepareShips()
+{
+	while (!ShipsAreReady())
+	{
+		Try2RandomAquatory();
+		Message(m_Aqua.PrintOwn());
+	}
+
+	return true;
+}
+
 bool CBattlePlayer::PrepareShips()
 {
 	string buf; // Разработка метода задания расположения кораблей игроком из заранее подготовленного файла
@@ -221,6 +232,56 @@ bool CBattlePlayer::PrepareShips()
 		return true;
 	}
 }
+
+bool CBattlePlayer::ComputerDoMove()
+{
+	srand(time(0));
+	int x, y;
+	char letter;
+	string move = "";
+
+	do
+	{
+		x = rand() % 10;
+		y = rand() % 10;
+		letter = 'A' + y;
+		move = string(1, letter) + to_string(x + 1);
+		if (Try2DoMove(move))
+			break;
+		Sleep(50);
+	} while (true);
+	
+
+	CShip* ship = NULL;
+	if (m_pAnotherPlayer->m_Aqua.TestShip(move, &ship))
+	{
+		m_pAnotherPlayer->Message("Соперник  попал на " + move);
+
+		if (!ship->Alive())
+		{
+			if (!m_pAnotherPlayer->IsAlive())
+			{
+				m_pAnotherPlayer->Message("Вы проиграли(");
+				return true;
+			}
+			else
+			{
+				m_pAnotherPlayer->Message("Ваш корабль потоплен(\n");
+			}
+		}
+		m_pAnotherPlayer->Message(m_pAnotherPlayer->m_Aqua.PrintOwn());
+		Sleep(1000);
+		ComputerDoMove();
+	}
+	else
+	{
+		m_pAnotherPlayer->Message("Противник промахнулся) по " + move + "\n" + m_pAnotherPlayer->m_Aqua.PrintOwn());
+	}
+	Sleep(1000);
+
+	return true;
+}
+
 bool CBattlePlayer::DoMove()
 {
 	//Message(m_Aqua.PrintOwn());

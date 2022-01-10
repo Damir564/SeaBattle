@@ -79,7 +79,25 @@ bool CBattleGame::StartTCP(int port)
 
 		// вывод сведений о клиенте
 		printf("Игрок1 с IP [%s] на связи!\n", inet_ntoa(client_addr.sin_addr));
-
+		m_Player1.Message("Сыграть против компьютера? Y/N");
+		string buf; // Разработка метода задания расположения кораблей игроком из заранее подготовленного файла
+		char mode;
+		do
+		{
+			buf = m_Player1.recieve();
+			sscanf_s(buf.c_str(), "%c", &mode, 1);
+			mode = toupper(mode);
+			if (mode != 'N' && mode != 'Y')
+				m_Player1.Message("Неверный ввод");
+			else
+				break;
+		} while (true);
+		if (mode == 'Y')
+		{
+			m_playWithComputer = true;
+			return true;
+		}
+		m_playWithComputer = false;
 		client_socket = accept(mysocket, (sockaddr *)&client_addr, &client_addr_size);
 
 		m_Player2.m_sock = client_socket;
@@ -100,9 +118,12 @@ void CBattleGame::prepareShips()
 
 void CBattleGame::DoPlay()
 {
-	std::thread player1Thread(&CBattlePlayer::PrepareShips, &m_Player1);
-	std::thread player2Thread(&CBattlePlayer::PrepareShips, &m_Player2);
-
+	thread player1Thread(&CBattlePlayer::PrepareShips, &m_Player1);
+	thread player2Thread;
+	if (!m_playWithComputer)
+		player2Thread = thread(&CBattlePlayer::PrepareShips, &m_Player2);
+	else
+		player2Thread = thread(&CBattlePlayer::ComputerPrepareShips, &m_Player2);
 	player2Thread.join();
 	player1Thread.join();
 	m_Player2.Message("Ход соперника");
@@ -124,7 +145,12 @@ void CBattleGame::DoPlay()
 			m_Player1.DoMove();
 		
 		if (m_iCurrentMove == MOVE2)
-			m_Player2.DoMove();
+		{
+			if (!m_playWithComputer)
+				m_Player2.DoMove();
+			else
+				m_Player2.ComputerDoMove();
+		}
 		
 		m_iCurrentMove *= -1;
 	}

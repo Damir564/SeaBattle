@@ -23,6 +23,9 @@ public:
 	bool ShipsAreReady();
 	bool DoMove();
 
+	bool ComputerDoMove();
+	bool ComputerPrepareShips();
+
 	bool Try2PlaceShip(string ship);
 	bool Try2DoMove(string str);
 	void Message(string str);

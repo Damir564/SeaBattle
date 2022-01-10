@@ -21,6 +21,8 @@ public:
 
 	CBattlePlayer m_Player1, m_Player2;
 
+	bool m_playWithComputer;
+
 private:
 	void prepareShips();
 };

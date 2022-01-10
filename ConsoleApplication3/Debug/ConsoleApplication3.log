@@ -1,3 +1,4 @@
 ﻿  CBattlePlayer.cpp
 E:\Projects\VS\SeaBattle\ConsoleApplication3\CBattlePlayer.cpp(51,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+E:\Projects\VS\SeaBattle\ConsoleApplication3\CBattlePlayer.cpp(238,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
   ConsoleApplication3.vcxproj -> E:\Projects\VS\SeaBattle\Debug\ConsoleApplication3.exe
